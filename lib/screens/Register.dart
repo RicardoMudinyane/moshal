@@ -27,9 +27,9 @@ class RegisterState extends State<Register>
 
   Color left = Colors.black;
   Color right = Colors.white;
-  String varsity = 'Wits';
-  String gender = 'Male';
-  String faculty = 'Science';
+  String varsity = 'University';
+  String gender = 'Gender';
+  String faculty = 'Faculty';
 
   @override
   Widget build(BuildContext context) {
@@ -213,6 +213,7 @@ class RegisterState extends State<Register>
                                         });
                                       },
                                       items: <String>[
+                                        'Gender',
                                         'Male',
                                         'Female',
                                         'Prefer not saying'
@@ -271,6 +272,7 @@ class RegisterState extends State<Register>
                                         });
                                       },
                                       items: <String>[
+                                        'University',
                                         'Wits',
                                         'UCT',
                                         'UP',
@@ -363,6 +365,7 @@ class RegisterState extends State<Register>
                                         });
                                       },
                                       items: <String>[
+                                        'Faculty',
                                         'Science',
                                         'Engineering',
                                         'Health Care',

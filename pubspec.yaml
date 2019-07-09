@@ -7,6 +7,11 @@ environment:
   sdk: ">=2.0.0-dev.68.0 <3.0.0"
 
 dependencies:
+
+  calendar_view_widget:
+
+  intl: ^0.15.7
+
   flutter:
     sdk: flutter
   cupertino_icons: ^0.1.2
@@ -17,6 +22,7 @@ dependencies:
   timeago: ^2.0.10
   firebase_storage:
   table_calendar: ^1.2.3
+
 
 dev_dependencies:
   flutter_test:
@@ -30,6 +36,7 @@ flutter:
 
   assets:
       - assets/login_logo.png
+      - assets/img/fmg.png
 
   fonts:
     - family: WorkSansSemiBold

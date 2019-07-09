@@ -44,7 +44,7 @@ class _DashboardState extends State<Dashboard> {
                     child: Text(heading,
                         style: TextStyle(color:
                         new Color(color),
-                            fontSize: 10.5,
+                            fontSize: 11.0,
                             fontWeight: FontWeight.bold)),
                   ),
 

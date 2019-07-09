@@ -62,3 +62,42 @@ class Mark{
   }
 
 }
+
+class BirthdayList {
+  final List<Birthday> photos;
+
+  BirthdayList({
+    this.photos,
+  });
+
+  factory BirthdayList.fromJson(List<dynamic> parsedJson) {
+
+    List<Birthday> photos = new List<Birthday>();
+    photos = parsedJson.map((i)=>Birthday.fromJson(i)).toList();
+
+    return new BirthdayList(
+        photos: photos
+    );
+  }
+}
+
+class Birthday{
+  final String id;
+  final String title;
+  final String url;
+
+  Birthday({
+    this.id,
+    this.url,
+    this.title
+  }) ;
+
+  factory Birthday.fromJson(Map<String, dynamic> json){
+    return new Birthday(
+      id: json['id'].toString(),
+      title: json['title'],
+      url: json['json'],
+    );
+  }
+
+}
