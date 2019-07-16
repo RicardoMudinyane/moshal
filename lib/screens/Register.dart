@@ -4,6 +4,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:moshal/style/theme.dart' as Theme;
 import 'package:moshal/utils/bubble_indication_painter.dart';
 import 'package:moshal/screens/Log_Reg.dart';
+import 'dart:async';
 //import 'package:firebase_auth/firebase_auth.dart';
 
 class Register extends StatefulWidget {
@@ -30,6 +31,24 @@ class RegisterState extends State<Register>
   String varsity = 'University';
   String gender = 'Gender';
   String faculty = 'Faculty';
+
+  String _value = 'Date Of Birth';
+  DateTime selectedDate = DateTime.now();
+
+  Future<Null> _selectDate(BuildContext context) async {
+    final DateTime picked = await showDatePicker(
+        context: context,
+        initialDate: selectedDate,
+        firstDate: DateTime(1990, 8),
+        lastDate: DateTime(2020));
+    if (picked != null && picked != selectedDate)
+      setState(() {
+        selectedDate = picked;
+      });
+    _value = selectedDate.year.toString()+"-"+selectedDate.month.toString()+"-"+selectedDate.day.toString();
+
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -245,6 +264,40 @@ class RegisterState extends State<Register>
                                     ),
                                   ),
                                 ),
+                                Container(
+                                  width: 250.0,
+                                  height: 1.0,
+                                  color: Colors.grey[400],
+                                ),
+                                Padding(
+                                  padding: EdgeInsets.only(
+                                      top: 20.0,
+                                      bottom: 20.0,
+                                      left: 25.0,
+                                      right: 25.0),
+                                  child: Row(
+                                    children: <Widget>[
+                                      Icon(
+                                        FontAwesomeIcons.birthdayCake,
+                                        color: Colors.black,
+                                      ),
+                                      SizedBox(width: 5.0,),
+                                      InkWell(
+                                        onTap:(){
+                                          _selectDate(context);
+                                        },
+                                        child: new Text(_value,
+                                          style: TextStyle(
+                                              fontFamily: "WorkSansSemiBold",
+                                              fontSize: 16.0,
+                                              color: Colors.black),
+                                        ),
+
+                                      ),
+                                    ],
+                                  )
+                                ),
+
                                 Container(
                                   width: 250.0,
                                   height: 1.0,

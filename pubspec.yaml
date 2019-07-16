@@ -22,6 +22,7 @@ dependencies:
   timeago: ^2.0.10
   firebase_storage:
   table_calendar: ^1.2.3
+  random_color: ^1.0.3
 
 
 dev_dependencies:

@@ -4,11 +4,9 @@ import 'announcementsPage.dart';
 import 'calendar.dart';
 import 'Marks.dart';
 import 'Docs.dart';
-// import 'gallery.dart';
-// import 'contacts.dart';
-// import 'events_calendar.dart';
-// import 'chat_box.dart';
-// import 'todoList.dart';
+import 'Message.dart';
+import 'MyList.dart';
+import 'Contacts.dart';
 
 class Dashboard extends StatefulWidget {
   static String tag = 'home-page';
@@ -227,17 +225,17 @@ class _DashboardState extends State<Dashboard> {
             onTap:(){
               // perform action ontap
 //              print("Contacts");
-              // Navigator.push(context,
-              //     MaterialPageRoute(builder: (context) => Contacts())
-              // );
+               Navigator.push(context,
+                   MaterialPageRoute(builder: (context) => Contacts())
+               );
             },
             child: myItems(Icons.phone, "Contacts", 0xffd50000),
           ),
 
           InkWell(
             onTap:(){
-              // Navigator.push(context,
-              //     MaterialPageRoute(builder: (context) => Todo()));
+               Navigator.push(context,
+                   MaterialPageRoute(builder: (context) => MyListPage()));
             },
             child: myItems(Icons.format_line_spacing, "Todo", 0xffe65100),
           ),
@@ -246,9 +244,9 @@ class _DashboardState extends State<Dashboard> {
             onTap:(){
               // perform action ontap
 //              print("Contacts");
-
-              // Navigator.push(context,
-              //     MaterialPageRoute(builder: (context) => Messaging()) );
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => Messaging())
+              );
             },
             child: myItems(Icons.chat, "Message", 0xff004d40),
           ),
@@ -265,6 +263,8 @@ class _DashboardState extends State<Dashboard> {
           StaggeredTile.extent(1, 130.0),
           StaggeredTile.count(1, 1.45),
           StaggeredTile.extent(1, 130.0),
+
+          .3
 
         ],
       ),
