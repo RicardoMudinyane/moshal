@@ -264,7 +264,6 @@ class _DashboardState extends State<Dashboard> {
           StaggeredTile.count(1, 1.45),
           StaggeredTile.extent(1, 130.0),
 
-          .3
 
         ],
       ),
