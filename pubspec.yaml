@@ -23,6 +23,10 @@ dependencies:
   firebase_storage:
   table_calendar: ^1.2.3
   random_color: ^1.0.3
+  share: ^0.6.2
+  url_launcher: ^5.1.0
+  webview_flutter: ^0.1.2
+  image_picker: ^0.5.3
 
 
 dev_dependencies:

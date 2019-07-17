@@ -1,12 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
-import 'announcementsPage.dart';
-import 'calendar.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'AnnouncementsPage.dart';
+import 'Calendar.dart';
 import 'Marks.dart';
 import 'Docs.dart';
 import 'Message.dart';
 import 'MyList.dart';
+import 'Gallery.dart';
 import 'Contacts.dart';
+import 'package:moshal/nav_menu/feedback.dart';
+import 'package:moshal/nav_menu/settings.dart';
+import 'package:moshal/nav_menu/About.dart';
+import 'package:moshal/nav_menu/EditInfo.dart';
+import 'package:share/share.dart';
 
 class Dashboard extends StatefulWidget {
   static String tag = 'home-page';
@@ -74,6 +81,14 @@ class _DashboardState extends State<Dashboard> {
   @override
   Widget build(BuildContext context) {
 
+    void shre(){
+      final RenderBox box =context.findRenderObject();
+      Share.share('smasol.co.za',
+          sharePositionOrigin:
+          box.localToGlobal(Offset.zero) & box.size
+      );
+    }
+
 //    double full_width = MediaQuery.of(context).size.width*1.0;
 
     return Scaffold(
@@ -92,7 +107,7 @@ class _DashboardState extends State<Dashboard> {
 
               currentAccountPicture: new GestureDetector(
                 child: new CircleAvatar(
-                  backgroundImage: new AssetImage(''),
+                  backgroundImage: new NetworkImage('https://eecs.ceas.uc.edu/DDEL/images/default_display_picture.png/@@images/image.png'),
                 ),
                 onTap: () => print("This is your current account."),
               ),
@@ -102,40 +117,39 @@ class _DashboardState extends State<Dashboard> {
                 title: new Text("Personal Details"),
                 trailing: new Icon(Icons.account_circle),
                 onTap: () {
-                  // Navigator.of(context).pop();
-                  // Navigator.of(context).push(new MaterialPageRoute(builder: (BuildContext context) => new Page("My Profile")));
+                   Navigator.of(context).pop();
+                   Navigator.of(context).push(new MaterialPageRoute(builder: (BuildContext context) => new ProfilePage()));
                 }
             ),
             new ListTile(
                 title: new Text("Feedback"),
                 trailing: new Icon(Icons.feedback),
                 onTap: () {
-                  // Navigator.of(context).pop();
-                  // Navigator.of(context).push(new MaterialPageRoute(builder: (BuildContext context) => new Page("Feedback")));
+                   Navigator.of(context).pop();
+                   Navigator.of(context).push(new MaterialPageRoute(builder: (BuildContext context) => new FeedbackPage()));
                 }
             ),
             new ListTile(
                 title: new Text("Settings"),
                 trailing: new Icon(Icons.info),
                 onTap: () {
-                  // Navigator.of(context).pop();
-                  // Navigator.of(context).push(new MaterialPageRoute(builder: (BuildContext context) => new Page("Settings")));
+                   Navigator.of(context).pop();
+                   Navigator.of(context).push(new MaterialPageRoute(builder: (BuildContext context) => new Settings()));
                 }
             ),
             new ListTile(
                 title: new Text("About"),
                 trailing: new Icon(Icons.info),
                 onTap: () {
-                  // Navigator.of(context).pop();
-                  // Navigator.of(context).push(new MaterialPageRoute(builder: (BuildContext context) => new Page("About Page")));
+                   Navigator.of(context).pop();
+                   Navigator.of(context).push(new MaterialPageRoute(builder: (BuildContext context) => new About()));
                 }
             ),
             new ListTile(
                 title: new Text("Share"),
                 trailing: new Icon(Icons.share),
                 onTap: () {
-                  // Navigator.of(context).pop();
-                  // Navigator.of(context).push(new MaterialPageRoute(builder: (BuildContext context) => new Page("Share")));
+                  shre();
                 }
             ),
             new Divider(),
@@ -203,12 +217,9 @@ class _DashboardState extends State<Dashboard> {
 
           InkWell(
             onTap:(){
-              // perform action ontap
-              print("Gallery");
-              // Navigator.push(context,
-              //     MaterialPageRoute(builder: (context) => Gallery())
-              // );
-
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => Gallery())
+              );
             },
             child: myItems(Icons.photo, "Gallery", 0xff1b5e20),
           ),
@@ -269,6 +280,15 @@ class _DashboardState extends State<Dashboard> {
       ),
 
     );
+  }
+
+  _launchURL() async {
+    const url = 'https://flutter.dev';
+    if (await canLaunch(url)) {
+      await launch(url);
+    } else {
+      throw 'Could not launch $url';
+    }
   }
 
 }

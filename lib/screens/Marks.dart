@@ -24,7 +24,6 @@ class MarksState extends State<Marks> {
           key: _scaffoldKey,
           appBar: new AppBar(
             title: new Text("Marks Submission"),
-            backgroundColor: Colors.redAccent,
             leading: IconButton(
                 icon: Icon(Icons.arrow_back),
                 onPressed: () {
