@@ -3,9 +3,13 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:random_color/random_color.dart';
 import 'package:url_launcher/url_launcher.dart' as UrlLauncher;
 import 'dart:async';
+import 'package:graphql_flutter/graphql_flutter.dart';
+import 'package:moshal/services/graphqldata.dart';
 
 class Contacts extends StatefulWidget {
   @override
+  final String _uni;
+  Contacts(this._uni);
   ContactsState createState() {
     return new ContactsState();
   }
@@ -44,24 +48,19 @@ class ContactsState extends State<Contacts> {
     });
   }
 
+  String _uni;
+
   @override
   void initState() {
     super.initState();
     _isSearching = false;
     values();
+    _uni = widget._uni;
+    debugPrint(_uni);
   }
 
   void values() {
     _list = List();
-    _list.add(
-        "Ricardo Mudinyane 077228754 test@gmail.com https://media.wired.com/photos/5b86fce8900cb57bbfd1e7ee/master/pass/Jaguar_I-PACE_S_Indus-Silver_065.jpg");
-    _list.add("Sithole Thulani 0855454584 test2@gmail.com ");
-    _list.add("Kat Mphuthi 0647512454 kat@gmail.com ");
-    _list.add("Muthu Munwe 06556456124 munwe@gmail.com ");
-    _list.add("Brendan Rovholo 0722897821 bre@gmail.com ");
-    _list.add("Example Ricky 072567515 ric@gmail.com ");
-    _list.add("Echo Murphy 0720854765 murphy@gmail.com ");
-    _list.add("Abby Bellemy 0735655455 abby@bel.com ");
   }
 
   @override
@@ -74,118 +73,293 @@ class ContactsState extends State<Contacts> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisSize: MainAxisSize.min,
                 children: <Widget>[
-                  new Flexible(
-                      child: searchresult.length != 0 ||
-                          _controller.text.isNotEmpty
-                          ? new ListView.builder(
-                        shrinkWrap: true,
-                        itemCount: searchresult.length,
-                        itemBuilder: (BuildContext context, int index) {
-//              String listData = searchresult[index];
-                          RandomColor _randomC = RandomColor();
-                          Color _color = _randomC.randomColor(
-                              colorBrightness: ColorBrightness.light);
-                          var perInfo = searchresult[index].split(" ");
-                          String name = perInfo[0] + " " + perInfo[1];
-                          String image = perInfo[4];
-                          String email = perInfo[3];
-                          String cellnumber = perInfo[2];
-                          var nameInit = name[0].toUpperCase();
-                          if (image.length > 0) {
-                            nameInit = "";
+              new Flexible(
+                child: searchresult.length != 0 || _controller.text.isNotEmpty
+                    ? Query(
+                        options: QueryOptions(
+                            document: getSearchedQuery(_uni, _controller.text),
+                            pollInterval: 10000),
+                        builder: (QueryResult result, {VoidCallback refetch}) {
+                          if (result.errors != null) {
+                            return Text(result.errors.toString());
                           }
-                          Future trying() async {
-                            return showDialog(
-                                context: context,
-                                builder: (BuildContext context) =>
-                                    InfoCard(
-                                      name: name,
-                                      phone: cellnumber,
-                                      email: email,
-                                      image: image,
-                                      colorIm: _color,
-                                      imageLetter: nameInit,
-                                    ));
+                          if (result.data['getSearchedStudents'].length == 0) {
+                            return Padding(
+                                padding: EdgeInsets.only(top:15.0),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: <Widget>[
+                                    Text(
+                                      'No Result',
+                                      textAlign: TextAlign.center,
+                                    )
+                                  ],
+                                ));
                           }
 
-                          return new ListTile(
-                            leading: CircleAvatar(
-                              backgroundColor: _color,
-                              backgroundImage: NetworkImage(image),
-                              foregroundColor: Colors.black,
-                              radius: 25.0,
-                              child: Text(
-                                nameInit,
-                                style: TextStyle(
+                          if (result.loading) {
+                            return Padding(
+                                padding: EdgeInsets.only(top:15.0),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: <Widget>[
+                                    Text(
+                                      'Loading',
+                                      textAlign: TextAlign.center,
+                                    )
+                                  ],
+                                ));
+                          }
+
+                          RandomColor _randomC = RandomColor();
+
+                          String image = "";
+
+                          return ListView.builder(
+                            itemCount:
+                                result.data['getSearchedStudents'].length,
+                            itemBuilder: (BuildContext context, int index) {
+                              String name = result.data['getSearchedStudents']
+                                  [index]['name'];
+                              String surname =
+                                  result.data['getSearchedStudents'][index]
+                                      ['surname'];
+                              String cellnumber =
+                                  result.data['getSearchedStudents'][index]
+                                      ['cellnumber'];
+                              String email = result.data['getSearchedStudents']
+                                  [index]['email'];
+                              return new ListTile(
+                                leading: CircleAvatar(
+                                  backgroundColor: _randomC.randomColor(
+                                      colorBrightness: ColorBrightness.light),
+                                  foregroundColor: Colors.black,
+                                  radius: 25.0,
+                                  child: Text(
+                                    name[0],
+                                    style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 20.0),
+                                  ),
+                                ),
+                                title: Text(
+                                  name + " " + surname,
+                                  style: TextStyle(
                                     fontWeight: FontWeight.bold,
-                                    fontSize: 20.0),
-                              ),
-                            ),
-                            title: Text(
-                              name,
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            subtitle: Text(cellnumber),
+                                  ),
+                                ),
+                                subtitle: Text(cellnumber),
+                                onTap: () => {
+                                      showDialog(
+                                          context: context,
+                                          builder: (BuildContext context) =>
+                                              InfoCard(
+                                                name: name + " " + surname,
+                                                phone: cellnumber,
+                                                email: email,
+                                                image: image,
+                                                colorIm: _randomC.randomColor(
+                                                    colorBrightness:
+                                                        ColorBrightness.light),
+                                                imageLetter: name[0],
+                                              ))
+                                    },
+                              );
+                            },
                           );
                         },
                       )
-                          : new ListView.builder(
-                        shrinkWrap: true,
-                        itemCount: _list.length,
-                        itemBuilder: (BuildContext context, int index) {
-//              String listData = _list[index];
+                    : Query(
+                        options: QueryOptions(
+                            document: getStudentsContacts(_uni),
+                            pollInterval: 10000),
+                        builder: (QueryResult result, {VoidCallback refetch}) {
+                          if (result.errors != null) {
+                            return Text(result.errors.toString());
+                          }
+                          if (result.loading) {
+                            return Padding(
+                                padding: EdgeInsets.only(top:15.0),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: <Widget>[
+                                    Text(
+                                      'Loading',
+                                      textAlign: TextAlign.center,
+                                    )
+                                  ],
+                                ));
+                          }
                           RandomColor _randomC = RandomColor();
-                          Color _color = _randomC.randomColor(
-                              colorBrightness: ColorBrightness.light);
-                          var perInfo = _list[index].split(" ");
-                          String name = perInfo[0] + " " + perInfo[1];
 
-                          String cellnumber = perInfo[2];
-                          String image = perInfo[4];
-                          String email = perInfo[3];
-                          var nameInit = name[0].toUpperCase();
-                          if (image.length > 0) {
-                            nameInit = "";
-                          }
-                          Future trying() async {
-                            return showDialog(
-                                context: context,
-                                builder: (BuildContext context) =>
-                                    InfoCard(
-                                      name: name,
-                                      phone: cellnumber,
-                                      email: email,
-                                      image: image,
-                                      colorIm: _color,
-                                      imageLetter: nameInit,
-                                    ));
-                          }
+                          String image = "";
 
-                          return new ListTile(
-                              leading: CircleAvatar(
-                                backgroundColor: _color,
-                                backgroundImage: NetworkImage(image),
-                                foregroundColor: Colors.black,
-                                radius: 25.0,
-                                child: Text(
-                                  nameInit,
-                                  style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 20.0),
+                          return ListView.builder(
+                            itemCount:
+                                result.data['getStudentsContacts'].length,
+                            itemBuilder: (BuildContext context, int index) {
+                              String name = result.data['getStudentsContacts']
+                                  [index]['name'];
+                              String surname =
+                                  result.data['getStudentsContacts'][index]
+                                      ['surname'];
+                              String cellnumber =
+                                  result.data['getStudentsContacts'][index]
+                                      ['cellnumber'];
+                              String email = result.data['getStudentsContacts']
+                                  [index]['email'];
+                              return new ListTile(
+                                leading: CircleAvatar(
+                                  backgroundColor: _randomC.randomColor(
+                                      colorBrightness: ColorBrightness.light),
+                                  foregroundColor: Colors.black,
+                                  radius: 25.0,
+                                  child: Text(
+                                    name[0],
+                                    style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 20.0),
+                                  ),
                                 ),
-                              ),
-                              title: Text(name,
+                                title: Text(
+                                  name + " " + surname,
                                   style: TextStyle(
                                     fontWeight: FontWeight.bold,
-                                  )),
-                              subtitle: Text(cellnumber),
-                              onTap: trying);
+                                  ),
+                                ),
+                                subtitle: Text(cellnumber),
+                                onTap: () => {
+                                      showDialog(
+                                          context: context,
+                                          builder: (BuildContext context) =>
+                                              InfoCard(
+                                                name: name + " " + surname,
+                                                phone: cellnumber,
+                                                email: email,
+                                                image: image,
+                                                colorIm: _randomC.randomColor(
+                                                    colorBrightness:
+                                                        ColorBrightness.light),
+                                                imageLetter: name[0],
+                                              ))
+                                    },
+                              );
+                            },
+                          );
                         },
-                      ))
-                ])));
+                      ),
+              )
+            ])));
   }
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return new Scaffold(
+//       key: globalKey,
+//       appBar: buildAppBar(context),
+//       body: new Container(
+//     child: new Column(
+//     crossAxisAlignment: CrossAxisAlignment.start,
+//       mainAxisSize: MainAxisSize.min,
+//       children: <Widget>[
+//         new Flexible(
+//           child: searchresult.length != 0 || _controller.text.isNotEmpty
+//               ? new ListView.builder(
+//             shrinkWrap: true,
+//             itemCount: searchresult.length,
+//             itemBuilder: (BuildContext context, int index) {
+// //              String listData = searchresult[index];
+//               RandomColor _randomC = RandomColor();
+//               Color _color = _randomC.randomColor(
+//                   colorBrightness: ColorBrightness.light
+//               );
+//               var perInfo = searchresult[index].split(" ");
+//               String name = perInfo[0]+" "+perInfo[1];
+//               String image = perInfo[4];
+//               String email =perInfo[3];
+//               String cellnumber = perInfo[2];
+//               var nameInit  = name[0].toUpperCase();
+//               if (image.length > 0){
+//                 nameInit = "";
+//               }
+//               Future trying() async {
+//                  return showDialog(context: context,
+//                     builder: (BuildContext context) =>
+//                     InfoCard(
+//                       name: name,
+//                       phone: cellnumber,
+//                       email: email,
+//                       image: image,
+//                       colorIm: _color,
+//                       imageLetter: nameInit,
+//                     )
+//                   );
+//               }
+//               return new ListTile(
+//                 leading: CircleAvatar(
+//                   backgroundColor: _color,
+//                   backgroundImage: NetworkImage(image),
+//                   foregroundColor: Colors.black,
+//                   radius: 25.0,
+//                   child: Text(nameInit,style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20.0),),
+//                 ),
+//                 title: Text(name, style:TextStyle(fontWeight: FontWeight.bold,) ,),
+//                 subtitle: Text(cellnumber),
+//               );
+//             },
+//           )
+//               : new ListView.builder(
+//             shrinkWrap: true,
+//             itemCount: _list.length,
+//             itemBuilder: (BuildContext context, int index) {
+// //              String listData = _list[index];
+//               RandomColor _randomC = RandomColor();
+//               Color _color = _randomC.randomColor(
+//                   colorBrightness: ColorBrightness.light
+//               );
+//               var perInfo = _list[index].split(" ");
+//               String name = perInfo[0]+" "+perInfo[1];
+
+//               String cellnumber = perInfo[2];
+//               String image = perInfo[4];
+//               String email =perInfo[3];
+//               var nameInit  = name[0].toUpperCase();
+//               if (image.length > 0){
+//                 nameInit = "";
+//               }
+//               Future trying() async {
+//                  return showDialog(context: context,
+//                     builder: (BuildContext context) =>
+//                     InfoCard(
+//                       name: name,
+//                       phone: cellnumber,
+//                       email: email,
+//                       image: image,
+//                       colorIm: _color,
+//                       imageLetter: nameInit,
+//                     )
+//                   );
+//               }
+
+//                    return new ListTile(
+//                         leading: CircleAvatar(
+//                                 backgroundColor: _color,
+//                                 backgroundImage: NetworkImage(image),
+//                                 foregroundColor: Colors.black,
+//                                 radius: 25.0,
+//                                 child: Text(nameInit,style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20.0),),
+//                               ),
+//                               title: Text(name, style:TextStyle(fontWeight: FontWeight.bold,)),
+//                               subtitle: Text(cellnumber),
+//                               onTap: trying
+//               );
+//             },
+//           ))
+//       ]
+//     )
+//       )
+//     );
+//   }
 
   Widget buildAppBar(BuildContext context) {
     return new AppBar(centerTitle: true, title: appBarTitle, actions: <Widget>[
@@ -384,7 +558,6 @@ class InfoCard extends StatelessWidget {
           right: Consts.padding,
           child: CircleAvatar(
             backgroundColor: colorIm,
-            backgroundImage: NetworkImage(image),
             foregroundColor: Colors.black,
             radius: Consts.avatarRadius,
             child: Text(
@@ -400,7 +573,6 @@ class InfoCard extends StatelessWidget {
 
 class Consts {
   Consts._();
-
   static const double padding = 10.0;
   static const double avatarRadius = 45.0;
 }

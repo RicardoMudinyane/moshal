@@ -5,6 +5,7 @@ import 'package:moshal/style/theme.dart' as Theme;
 import 'package:moshal/utils/bubble_indication_painter.dart';
 import 'package:moshal/screens/Log_Reg.dart';
 import 'dart:async';
+import '../api_service.dart';
 //import 'package:firebase_auth/firebase_auth.dart';
 
 class Register extends StatefulWidget {
@@ -22,13 +23,30 @@ class RegisterState extends State<Register>
 
   bool _obscureTextSignup = true;
   bool _obscureTextSignupConfirm = true;
+  String returned_message = "";
+  Color message_color;
 
-  TextEditingController _cEmail = new TextEditingController();
+  ApiService apiService;
+  String name, surname, email, cellnumber;
+  String dob, degree, yos, password;
+
+  @override
+  void initState() {
+    super.initState();
+    apiService = new ApiService();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+  }
+
+  // TextEditingController email = new TextEditingController();
   TextEditingController _cPass = new TextEditingController();
 
   Color left = Colors.black;
   Color right = Colors.white;
-  String varsity = 'University';
+  String university = 'University';
   String gender = 'Gender';
   String faculty = 'Faculty';
 
@@ -45,10 +63,13 @@ class RegisterState extends State<Register>
       setState(() {
         selectedDate = picked;
       });
-    _value = selectedDate.year.toString()+"-"+selectedDate.month.toString()+"-"+selectedDate.day.toString();
-
+    _value = selectedDate.year.toString() +
+        "-" +
+        selectedDate.month.toString() +
+        "-" +
+        selectedDate.day.toString();
+    dob = _value;
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -56,6 +77,7 @@ class RegisterState extends State<Register>
       appBar: AppBar(
         title: Text("Register"),
       ),
+      key: _scaffoldKey,
       body: SingleChildScrollView(
         child: Center(
           child: Padding(
@@ -90,7 +112,8 @@ class RegisterState extends State<Register>
                                     // focusNode: myFocusNodeName,
                                     // controller: signupNameController,
                                     keyboardType: TextInputType.text,
-                                    textCapitalization: TextCapitalization.words,
+                                    textCapitalization:
+                                        TextCapitalization.words,
                                     style: TextStyle(
                                         fontFamily: "WorkSansSemiBold",
                                         fontSize: 16.0,
@@ -106,6 +129,7 @@ class RegisterState extends State<Register>
                                           fontFamily: "WorkSansSemiBold",
                                           fontSize: 16.0),
                                     ),
+                                    onChanged: (val) => name = val,
                                   ),
                                 ),
                                 Container(
@@ -123,7 +147,8 @@ class RegisterState extends State<Register>
                                     // focusNode: myFocusNodeName,
                                     // controller: signupNameController,
                                     keyboardType: TextInputType.text,
-                                    textCapitalization: TextCapitalization.words,
+                                    textCapitalization:
+                                        TextCapitalization.words,
                                     style: TextStyle(
                                         fontFamily: "WorkSansSemiBold",
                                         fontSize: 16.0,
@@ -139,6 +164,7 @@ class RegisterState extends State<Register>
                                           fontFamily: "WorkSansSemiBold",
                                           fontSize: 16.0),
                                     ),
+                                    onChanged: (val) => surname = val,
                                   ),
                                 ),
                                 Container(
@@ -170,7 +196,7 @@ class RegisterState extends State<Register>
                                           fontFamily: "WorkSansSemiBold",
                                           fontSize: 16.0),
                                     ),
-                                    controller: _cEmail,
+                                    onChanged: (val) => email = val,
                                   ),
                                 ),
                                 Container(
@@ -187,7 +213,8 @@ class RegisterState extends State<Register>
                                   child: TextField(
                                     // controller: signupNameController,
                                     keyboardType: TextInputType.number,
-                                    textCapitalization: TextCapitalization.words,
+                                    textCapitalization:
+                                        TextCapitalization.words,
                                     style: TextStyle(
                                         fontFamily: "WorkSansSemiBold",
                                         fontSize: 16.0,
@@ -203,6 +230,7 @@ class RegisterState extends State<Register>
                                           fontFamily: "WorkSansSemiBold",
                                           fontSize: 16.0),
                                     ),
+                                    onChanged: (val) => cellnumber = val,
                                   ),
                                 ),
                                 Container(
@@ -222,8 +250,8 @@ class RegisterState extends State<Register>
                                       decoration: InputDecoration(
                                         enabledBorder: UnderlineInputBorder(
                                             borderSide: BorderSide(
-                                              color: Colors.white,
-                                            )),
+                                          color: Colors.white,
+                                        )),
                                       ),
                                       value: gender,
                                       onChanged: (String newVar) {
@@ -236,7 +264,8 @@ class RegisterState extends State<Register>
                                         'Male',
                                         'Female',
                                         'Prefer not saying'
-                                      ].map<DropdownMenuItem<String>>((String value) {
+                                      ].map<DropdownMenuItem<String>>(
+                                          (String value) {
                                         return DropdownMenuItem<String>(
                                           value: value,
                                           child: Row(
@@ -248,11 +277,13 @@ class RegisterState extends State<Register>
                                                   image: new AssetImage(
                                                       'assets/img/fmg.png')),
                                               Padding(
-                                                padding: EdgeInsets.only(left: 12.0),
+                                                padding:
+                                                    EdgeInsets.only(left: 12.0),
                                                 child: Text(
                                                   value,
                                                   style: TextStyle(
-                                                      fontFamily: "WorkSansSemiBold",
+                                                      fontFamily:
+                                                          "WorkSansSemiBold",
                                                       fontSize: 16.0,
                                                       color: Colors.black),
                                                 ),
@@ -270,34 +301,34 @@ class RegisterState extends State<Register>
                                   color: Colors.grey[400],
                                 ),
                                 Padding(
-                                  padding: EdgeInsets.only(
-                                      top: 20.0,
-                                      bottom: 20.0,
-                                      left: 25.0,
-                                      right: 25.0),
-                                  child: Row(
-                                    children: <Widget>[
-                                      Icon(
-                                        FontAwesomeIcons.birthdayCake,
-                                        color: Colors.black,
-                                      ),
-                                      SizedBox(width: 5.0,),
-                                      InkWell(
-                                        onTap:(){
-                                          _selectDate(context);
-                                        },
-                                        child: new Text(_value,
-                                          style: TextStyle(
-                                              fontFamily: "WorkSansSemiBold",
-                                              fontSize: 16.0,
-                                              color: Colors.black),
+                                    padding: EdgeInsets.only(
+                                        top: 20.0,
+                                        bottom: 20.0,
+                                        left: 25.0,
+                                        right: 25.0),
+                                    child: Row(
+                                      children: <Widget>[
+                                        Icon(
+                                          FontAwesomeIcons.birthdayCake,
+                                          color: Colors.black,
                                         ),
-
-                                      ),
-                                    ],
-                                  )
-                                ),
-
+                                        SizedBox(
+                                          width: 10.0,
+                                        ),
+                                        InkWell(
+                                          onTap: () {
+                                            _selectDate(context);
+                                          },
+                                          child: new Text(
+                                            _value,
+                                            style: TextStyle(
+                                                fontFamily: "WorkSansSemiBold",
+                                                fontSize: 16.0,
+                                                color: Colors.black),
+                                          ),
+                                        ),
+                                      ],
+                                    )),
                                 Container(
                                   width: 250.0,
                                   height: 1.0,
@@ -315,13 +346,13 @@ class RegisterState extends State<Register>
                                       decoration: InputDecoration(
                                         enabledBorder: UnderlineInputBorder(
                                             borderSide: BorderSide(
-                                              color: Colors.white,
-                                            )),
+                                          color: Colors.white,
+                                        )),
                                       ),
-                                      value: varsity,
+                                      value: university,
                                       onChanged: (String newVar) {
                                         setState(() {
-                                          varsity = newVar;
+                                          university = newVar;
                                         });
                                       },
                                       items: <String>[
@@ -332,7 +363,8 @@ class RegisterState extends State<Register>
                                         'NMU',
                                         'Stellenbosch',
                                         'UKZN'
-                                      ].map<DropdownMenuItem<String>>((String value) {
+                                      ].map<DropdownMenuItem<String>>(
+                                          (String value) {
                                         return DropdownMenuItem<String>(
                                           value: value,
                                           child: Row(
@@ -342,11 +374,13 @@ class RegisterState extends State<Register>
                                                 size: 29.0,
                                               ),
                                               Padding(
-                                                padding: EdgeInsets.only(left: 12.0),
+                                                padding:
+                                                    EdgeInsets.only(left: 12.0),
                                                 child: Text(
                                                   value,
                                                   style: TextStyle(
-                                                      fontFamily: "WorkSansSemiBold",
+                                                      fontFamily:
+                                                          "WorkSansSemiBold",
                                                       fontSize: 16.0,
                                                       color: Colors.black),
                                                 ),
@@ -372,7 +406,8 @@ class RegisterState extends State<Register>
                                   child: TextField(
                                     // controller: signupNameController,
                                     keyboardType: TextInputType.text,
-                                    textCapitalization: TextCapitalization.words,
+                                    textCapitalization:
+                                        TextCapitalization.words,
                                     style: TextStyle(
                                         fontFamily: "WorkSansSemiBold",
                                         fontSize: 16.0,
@@ -388,6 +423,7 @@ class RegisterState extends State<Register>
                                           fontFamily: "WorkSansSemiBold",
                                           fontSize: 16.0),
                                     ),
+                                    onChanged: (val) => degree = val,
                                   ),
                                 ),
                                 Container(
@@ -407,8 +443,8 @@ class RegisterState extends State<Register>
                                       decoration: InputDecoration(
                                         enabledBorder: UnderlineInputBorder(
                                             borderSide: BorderSide(
-                                              color: Colors.white,
-                                            )),
+                                          color: Colors.white,
+                                        )),
                                       ),
                                       value: faculty,
                                       onChanged: (String newVar) {
@@ -424,7 +460,8 @@ class RegisterState extends State<Register>
                                         'Health Care',
                                         'Law',
                                         'Humanity'
-                                      ].map<DropdownMenuItem<String>>((String value) {
+                                      ].map<DropdownMenuItem<String>>(
+                                          (String value) {
                                         return DropdownMenuItem<String>(
                                           value: value,
                                           child: Row(
@@ -434,11 +471,13 @@ class RegisterState extends State<Register>
                                                 size: 29.0,
                                               ),
                                               Padding(
-                                                padding: EdgeInsets.only(left: 12.0),
+                                                padding:
+                                                    EdgeInsets.only(left: 12.0),
                                                 child: Text(
                                                   value,
                                                   style: TextStyle(
-                                                      fontFamily: "WorkSansSemiBold",
+                                                      fontFamily:
+                                                          "WorkSansSemiBold",
                                                       fontSize: 16.0,
                                                       color: Colors.black),
                                                 ),
@@ -464,7 +503,8 @@ class RegisterState extends State<Register>
                                   child: TextField(
                                     // controller: signupNameController,
                                     keyboardType: TextInputType.number,
-                                    textCapitalization: TextCapitalization.words,
+                                    textCapitalization:
+                                        TextCapitalization.words,
                                     style: TextStyle(
                                         fontFamily: "WorkSansSemiBold",
                                         fontSize: 16.0,
@@ -480,6 +520,7 @@ class RegisterState extends State<Register>
                                           fontFamily: "WorkSansSemiBold",
                                           fontSize: 16.0),
                                     ),
+                                    onChanged: (val) => yos = val,
                                   ),
                                 ),
                                 Container(
@@ -521,7 +562,7 @@ class RegisterState extends State<Register>
                                         ),
                                       ),
                                     ),
-                                    controller: _cPass,
+                                    onChanged: (val) => password = val,
                                   ),
                                 ),
                                 Container(
@@ -597,22 +638,21 @@ class RegisterState extends State<Register>
                               tileMode: TileMode.clamp),
                         ),
                         child: MaterialButton(
-                          highlightColor: Colors.transparent,
-                          splashColor: Theme.Colors.loginGradientEnd,
-                          //shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(5.0))),
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(
-                                vertical: 10.0, horizontal: 42.0),
-                            child: Text(
-                              " Sign Up",
-                              style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 25.0,
-                                  fontFamily: "WorkSansBold"),
+                            highlightColor: Colors.transparent,
+                            splashColor: Theme.Colors.loginGradientEnd,
+                            //shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(5.0))),
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(
+                                  vertical: 10.0, horizontal: 42.0),
+                              child: Text(
+                                " Sign Up",
+                                style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 25.0,
+                                    fontFamily: "WorkSansBold"),
+                              ),
                             ),
-                          ),
-                          onPressed: () => signUp()
-                        ),
+                            onPressed: () => signUp()),
                       ),
                     ],
                   ),
@@ -622,8 +662,6 @@ class RegisterState extends State<Register>
           ),
         ),
       ),
-
-
     );
   }
 
@@ -639,18 +677,87 @@ class RegisterState extends State<Register>
     });
   }
 
+  void signUp() {
 
-  void signUp() async {
-//
-//    FirebaseUser user;
-//    try {
-//      user = await mAuth.createUserWithEmailAndPassword(
-//          email: _cEmail.text, password: _cPass.text);
-//    }
-//    catch(e){
-//      print(e.toString());
-//    }
-    Navigator.push(context, MaterialPageRoute(builder: (context) => LoginPage()));
+    showDialog(
+      context: context,
+      barrierDismissible: true,
+      child: Padding(
+        padding: const EdgeInsets.only(top:20.0),
+        child: new Dialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20.0) ),
+        child: Container(
+          height: 100.0 ,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              CircularProgressIndicator(),
+              SizedBox(
+                height: 15.0,
+              ),
+              Text("Loading...")
+            ],
+          ),
+        )
+      ),
+      )
+    );
 
+    debugPrint(" $name , $faculty , $dob , $cellnumber");
+    apiService
+        .registerUser(
+            name,
+            surname,
+            email,
+            gender.toLowerCase(),
+            dob,
+            university.toLowerCase(),
+            faculty.toLowerCase(),
+            degree,
+            yos,
+            cellnumber,
+            password)
+        .then((Response response) {
+      debugPrint("SOMETHING ${response.code}");
+      if (response.code == 200){
+        
+        returned_message = "Registration Successfully";
+        message_color = Colors.green;
+
+        Navigator.pop(context);
+        Navigator.push(
+        context, MaterialPageRoute(builder: (context) => LoginPage()));
+      }else if (response.code == 404){
+
+        returned_message = "Registration failed";
+        message_color = Colors.red;
+        Navigator.pop(context);
+        debugPrint(response.toString());
+      }
+          })
+    .catchError((e){
+      print("${e.error}");
+       Navigator.pop(context);
+      final message = e is MyHttpException ? e.message : "Something something";
+      debugPrint(message);
+    })
+    ;
+  }
+
+  void showSnackBar(String value, Color colors){
+
+    _scaffoldKey.currentState.showSnackBar(
+          new SnackBar(
+            content: Text(value, style:TextStyle(
+              color: colors,
+              fontWeight:FontWeight.bold
+            ),
+            textAlign: TextAlign.center,
+            ),
+          )
+        );
   }
 }

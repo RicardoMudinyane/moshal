@@ -4,6 +4,8 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:moshal/style/theme.dart' as Theme;
 import 'package:moshal/screens/Home.dart';
 import 'Register.dart';
+import 'dart:async';
+import '../api_service.dart';
 //import 'package:firebase_auth/firebase_auth.dart';
 
 class LoginPage extends StatefulWidget {
@@ -16,19 +18,35 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPageState extends State<LoginPage>
     with SingleTickerProviderStateMixin {
-  String _email, _password;
+  String email, password;
+  String returned_message = "";
+  Color message_color;
 
-  TextEditingController _cEmail = new TextEditingController();
-  TextEditingController _cPass = new TextEditingController();
+  ApiService apiService;
+  @override
+  void initState(){
+    super.initState();
+    apiService = new ApiService();
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitUp,
+      DeviceOrientation.portraitDown,
+    ]);
+
+    _pageController = PageController();
+    
+  }
+
+  @override
+  void dispose(){
+    _pageController?.dispose();
+    super.dispose();
+  }
 
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
 
   bool _obscureTextLogin = true;
   PageController _pageController;
-
-  Color left = Colors.black;
-  Color right = Colors.white;
 
   @override
   Widget build(BuildContext context) {
@@ -47,8 +65,8 @@ class _LoginPageState extends State<LoginPage>
                   Padding(
                     padding: EdgeInsets.only(top: 75.0),
                     child: new Image(
-                      width: 260.0,
-                      height: 180.0,
+                      width: 200.0,
+                      height: 190.0,
                       fit: BoxFit.fill,
                       image: new AssetImage('assets/img/login_logo.png'),
                     ),
@@ -94,7 +112,7 @@ class _LoginPageState extends State<LoginPage>
                                         fontFamily: "WorkSansSemiBold",
                                         fontSize: 17.0),
                                   ),
-                                  controller: _cEmail,
+                                  onChanged: (val) => email = val,
                                 ),
                               ),
                               Container(
@@ -136,7 +154,7 @@ class _LoginPageState extends State<LoginPage>
                                       ),
                                     ),
                                   ),
-                                  controller: _cPass,
+                                  onChanged: (val) => password = val,
                                 ),
                               ),
                             ],
@@ -184,7 +202,10 @@ class _LoginPageState extends State<LoginPage>
                                   fontFamily: "WorkSansBold"),
                             ),
                           ),
-                          onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => Dashboard()))
+                          onPressed: () => {
+                            _signIn(),
+                            showSnackBar(returned_message, message_color)
+                            }
                         ),
                       ),
                     ],
@@ -241,26 +262,6 @@ class _LoginPageState extends State<LoginPage>
     );
   }
 
-  @override
-  void dispose() {
-    // myFocusNodePassword.dispose();
-    // myFocusNodeEmail.dispose();
-    // myFocusNodeName.dispose();
-    _pageController?.dispose();
-    super.dispose();
-  }
-
-  @override
-  void initState() {
-    super.initState();
-
-    SystemChrome.setPreferredOrientations([
-      DeviceOrientation.portraitUp,
-      DeviceOrientation.portraitDown,
-    ]);
-
-    _pageController = PageController();
-  }
 
 
   void showInSnackBar(String value) {
@@ -280,9 +281,73 @@ class _LoginPageState extends State<LoginPage>
     ));
   }
 
+  void _signIn(){
+
+    showDialog(
+      context: context,
+      barrierDismissible: true,
+      child: Padding(
+        padding: const EdgeInsets.only(top:20.0),
+        child: new Dialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20.0) ),
+        child: Container(
+          height: 100.0 ,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              CircularProgressIndicator(),
+              SizedBox(
+                height: 15.0,
+              ),
+              Text("Loading...")
+            ],
+          ),
+        )
+      ),
+      )
+    );
+
+    apiService.loginUser(email, password).then((Map<dynamic, dynamic> res){
+      
+      if (res["code"] == 200){
+
+        returned_message = "Login Successfully";
+        message_color = Colors.green;
+        Navigator.pop(context);
+          Navigator.push(
+        context, MaterialPageRoute(builder: (context) => Dashboard(res["token"])));
+      }else{
+        returned_message = "Email or password is incorrect";
+        message_color = Colors.red;
+          Navigator.pop(context);
+          debugPrint("Email or password is incorrect");
+      }
+
+    });
+    
+  }
+
   void _toggleLogin() {
     setState(() {
       _obscureTextLogin = !_obscureTextLogin;
     });
   }
+
+  void showSnackBar(String value, Color colors){
+
+    _scaffoldKey.currentState.showSnackBar(
+          new SnackBar(
+            content: Text(value, style:TextStyle(
+              color: colors,
+              fontWeight:FontWeight.bold,
+            ),
+            textAlign: TextAlign.center,
+            ),
+          )
+        );
+  }
+
 }

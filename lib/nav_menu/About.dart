@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../screens/MoshalSite.dart';
+import 'MoshalSite.dart';
 import 'theApp.dart';
 import 'theFounder.dart';
 import 'theProgram.dart';

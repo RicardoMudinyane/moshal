@@ -42,7 +42,7 @@ class ChatScreenState extends State<ChatScreen> {
         padding: const EdgeInsets.only(left:10.0),
         decoration: new BoxDecoration(
             border: new Border.all(color: Colors.blueAccent),
-          borderRadius: BorderRadius.circular(25.0),
+          borderRadius: BorderRadius.circular(30.0),
         ),
         child: new Row(
           children: <Widget>[
@@ -52,8 +52,6 @@ class ChatScreenState extends State<ChatScreen> {
                     hintText: "Enter your message"),
                 controller: textEditingController,
                 onSubmitted: _handleSubmit,
-//                maxLines: 1000,
-//                maxLength: 1000,
               ),
             ),
             new Container(

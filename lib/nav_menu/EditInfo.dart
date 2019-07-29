@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:image_picker/image_picker.dart';
+//import 'package:image_picker/image_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'dart:io';
 import 'package:path/path.dart';
@@ -15,14 +15,14 @@ class _ProfilePageState extends State<ProfilePage> {
 
   @override
   Widget build(BuildContext context) {
-    Future getImage() async {
-      var image = await ImagePicker.pickImage(source: ImageSource.gallery);
-
-      setState(() {
-        _image = image;
-        print('Image Path $_image');
-      });
-    }
+//    Future getImage() async {
+//      var image = await ImagePicker.pickImage(source: ImageSource.gallery);
+//
+//      setState(() {
+//        _image = image;
+//        print('Image Path $_image');
+//      });
+//    }
 
     Future uploadPic(BuildContext context) async {
       String fileName = basename(_image.path);
@@ -88,7 +88,7 @@ class _ProfilePageState extends State<ProfilePage> {
                           size: 30.0,
                         ),
                         onPressed: () {
-                          getImage();
+//                          getImage();
                         },
                       ),
                     ),
